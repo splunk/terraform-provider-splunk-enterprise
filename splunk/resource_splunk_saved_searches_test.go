@@ -3,6 +3,7 @@ package splunk
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strconv"
 	"testing"
@@ -65,6 +66,19 @@ resource "splunk_saved_searches" "test" {
       owner = "admin"
       sharing = "app"
       app = "launcher"
+    }
+}
+`
+
+const savedSearchesNamespacedImport = `
+resource "splunk_saved_searches" "test" {
+    name          = "Test Namespaced Import"
+    search        = "index=main"
+    cron_schedule = "*/5 * * * *"
+    acl {
+      owner   = "admin"
+      sharing = "app"
+      app     = "search"
     }
 }
 `
@@ -770,6 +784,38 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 			{
 				ResourceName:      "splunk_saved_searches.test",
 				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccSplunkSavedSearchesNamespacedImport(t *testing.T) {
+	resourceName := "splunk_saved_searches.test"
+	importID := "/servicesNS/admin/search/saved/searches/" + url.PathEscape("Test Namespaced Import")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testAccSplunkSavedSearchesDestroyResources,
+		Steps: []resource.TestStep{
+			{
+				Config: savedSearchesNamespacedImport,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Namespaced Import"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/5 * * * *"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "admin"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "search"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.sharing", "app"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateId:     importID,
 				ImportStateVerify: true,
 			},
 		},
