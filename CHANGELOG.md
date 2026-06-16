@@ -1,3 +1,8 @@
+## 1.5.2
+* Fix: saved search `action_email_include_*`, `action_email_send_csv`, and `action_snow_event_param_severity` handle boolean JSON from Splunk Cloud API responses
+* Support for namespaced REST import of saved searches and data ui views
+* Fix: URL-encode saved search and dashboard names in read, update, delete, and ACL API calls
+
 ## 1.5.1
 * Fix: generic_acl app ACL updates on Splunk Cloud
 

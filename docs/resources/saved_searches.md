@@ -239,3 +239,20 @@ Saved searches in a specific Splunk namespace can be imported with a Splunk REST
 ```
 terraform import splunk_saved_searches.example "/servicesNS/<owner>/<app>/saved/searches/<url-encoded-saved-search-name>"
 ```
+
+### After import
+
+Import sets the resource `id` and `name` to the saved search name. REST-path imports also set initial ACL namespace values (`owner`, `app`, and an inferred `sharing` value). Import does not load every Splunk setting or permission list.
+
+Run `terraform plan` immediately after import. Plan output commonly includes drift until your configuration matches Splunk:
+
+- **ACL drift** — `acl.read` and `acl.write` are not populated during import and may differ from Splunk until you copy values from the Splunk UI or REST API into your `.tf` file. REST-path import infers `sharing` as `app` when `owner` is `nobody`, otherwise `user`. Globally shared saved searches (`sharing = "global"`) may show a one-time ACL change in plan; set `sharing = "global"` explicitly in config if needed.
+- **Unset attributes** — Saved searches expose many optional fields with Splunk defaults. A minimal import config will often produce a large plan until you define the attributes you care about or use `lifecycle { ignore_changes = [...] }`.
+- **Bare-name import** — Importing by name alone does not set `acl`. Without an `acl` block in config, the provider defaults to `owner = "nobody"` and `app = "search"`, which can cause refresh errors or plan changes for app- or user-scoped saved searches. Prefer REST-path import or set `acl` explicitly.
+
+Recommended workflow:
+
+1. `terraform import ...` (name or REST path)
+2. `terraform plan` — review drift
+3. Update `.tf` to match required settings, or use `terraform plan -generate-config-out=generated.tf` (Terraform 1.5+) as a starting point
+4. Run `terraform plan` again until only intentional changes remain
