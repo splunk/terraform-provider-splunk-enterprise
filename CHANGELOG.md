@@ -1,3 +1,6 @@
+## 1.5.3
+* Fix: release pipeline pins provider binary and artifact names to `terraform-provider-splunk` so installs work with registry address `splunk/splunk` (v1.5.2 release artifacts used incorrect names after the GitHub repo rename)
+
 ## 1.5.2
 * Fix: saved search `action_email_include_*`, `action_email_send_csv`, and `action_snow_event_param_severity` handle boolean JSON from Splunk Cloud API responses
 * Support for namespaced REST import of saved searches and data ui views
