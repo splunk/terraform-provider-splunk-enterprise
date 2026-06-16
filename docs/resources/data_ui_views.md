@@ -24,3 +24,17 @@ This resource block supports the following arguments:
 In addition to all arguments above, This resource block exports the following arguments:
 
 * `id` - The ID of the dashboard
+
+## Import
+
+Dashboards/views in the default namespace can be imported by name:
+
+```
+terraform import splunk_data_ui_views.example "<view-name>"
+```
+
+Dashboards/views in a specific Splunk namespace can be imported with a Splunk REST path or URL. URL-encode the view name when it contains spaces or other special characters:
+
+```
+terraform import splunk_data_ui_views.example "/servicesNS/<owner>/<app>/data/ui/views/<url-encoded-view-name>"
+```

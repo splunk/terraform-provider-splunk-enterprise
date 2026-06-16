@@ -225,3 +225,17 @@ This resource block supports the following arguments:
 In addition to all arguments above, This resource block exports the following arguments:
 
 - `id` - The ID of the saved search resource
+
+## Import
+
+Saved searches in the default namespace can be imported by name:
+
+```
+terraform import splunk_saved_searches.example "<saved-search-name>"
+```
+
+Saved searches in a specific Splunk namespace can be imported with a Splunk REST path or URL. URL-encode the saved search name when it contains spaces or other special characters:
+
+```
+terraform import splunk_saved_searches.example "/servicesNS/<owner>/<app>/saved/searches/<url-encoded-saved-search-name>"
+```

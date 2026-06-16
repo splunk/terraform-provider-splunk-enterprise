@@ -1263,10 +1263,24 @@ func savedSearches() *schema.Resource {
 		Update: savedSearchesUpdate,
 		Delete: savedSearchesDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			State: savedSearchesImportState,
 		},
 	}
 
+}
+
+func savedSearchesImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	imported, err := importNamespacedResourceState(d, "saved", "searches")
+	if err != nil {
+		return nil, err
+	}
+	if !imported {
+		if err := d.Set("name", d.Id()); err != nil {
+			return nil, err
+		}
+	}
+
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceAlertTrackV0() *schema.Resource {
